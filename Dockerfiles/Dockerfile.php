@@ -1,6 +1,3 @@
-# Credit: https://medium.com/@jasonterando/debugging-with-visual-studio-code-xdebug-and-docker-on-windows-b63a10b0dec
-# Credit: https://dev.to/jonesrussell/install-composer-in-custom-docker-image-3f71
-# Credit: https://stackoverflow.com/questions/41274829/php-error-the-zip-extension-and-unzip-command-are-both-missing-skipping
 FROM php:7.0-apache
 
 # Install Composer

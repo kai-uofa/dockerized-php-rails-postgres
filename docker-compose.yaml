@@ -1,24 +1,23 @@
 version: '3.8'
 
 services: 
-  # Credit https://medium.com/@jasonterando/debugging-with-visual-studio-code-xdebug-and-docker-on-windows-b63a10b0dec
   development:
     build:
       context: .
       dockerfile: ./Dockerfiles/Dockerfile.dev
       args:
-        ruby_version: 2.4.9
-        rails_directory: rails
-        php_directory: php-api
+        ruby_version: ${RUBY_VERSION}
+        rails_directory: ${RAILS_DIRECTORY}
+        php_directory: ${PHP_DIRECTORY}
     image: me-dev-api
     container_name: me-dev-api
     env_file:
       - ./env-variables/development.env
     volumes:
       # binding volume for PHP api
-      - ../php-api:/var/www/html:cached
+      - ../${PHP_DIRECTORY}:/var/www/html:cached
       # binding volume for Rails
-      - ../rails:/rails:cached
+      - ../${RAILS_DIRECTORY}:/${RAILS_DIRECTORY}:cached
     ports:
       - 4567:80
     depends_on: 
@@ -37,7 +36,7 @@ services:
       # [Do Not Change] binding volume for init.sql
       - ./dev-configs/db_init.sh:/docker-entrypoint-initdb.d/db_init.sh
       # binding volume for Postgres database
-      - ../postgres-data:/var/lib/postgresql/data
+      - ../${POSTGRES_DIRECTORY}:/var/lib/postgresql/data
       # binding database backup file
       - ./dev-configs/database_backup.gz:/home/database_backup.gz:ro
     ports: 

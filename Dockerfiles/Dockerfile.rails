@@ -1,7 +1,3 @@
-# Credit: https://docs.docker.com/compose/rails/
-# Credit: https://github.com/chrisf/rails-postgres-docker/blob/master/Dockerfile
-# Credit: https://www.codewithjason.com/dockerize-rails-application/
-# Credit: https://evilmartians.com/chronicles/ruby-on-whales-docker-for-ruby-rails-development
 FROM ruby:2.4.9
 
 # Use a directory called /rails in which to store this application's files.
