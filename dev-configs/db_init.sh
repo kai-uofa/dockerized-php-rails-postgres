@@ -12,5 +12,7 @@ psql -a -e --username postgres -c "GRANT ALL PRIVILEGES ON DATABASE ${DEV_DATABA
 
 # Import data to dev database
 BACKUP_FILE=$(find /home -maxdepth 1 -type f | grep ".gz")
-echo "Restoring database. This might take a while..."
-gunzip < ${BACKUP_FILE} | psql --username postgres ${DEV_DATABASE_NAME}
+if [ -f "${BACKUP_FILE}" ]; then
+    echo "Restoring database. This might take a while..."
+    gunzip < ${BACKUP_FILE} | psql --username postgres ${DEV_DATABASE_NAME}
+fi

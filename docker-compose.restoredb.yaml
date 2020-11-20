@@ -1,0 +1,7 @@
+version: '3.8'
+
+services: 
+  database:
+    volumes: 
+      # binding database backup file
+      - ./dev-configs/database_backup.gz:/home/database_backup.gz:ro

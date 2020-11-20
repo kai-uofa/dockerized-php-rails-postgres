@@ -37,8 +37,6 @@ services:
       - ./dev-configs/db_init.sh:/docker-entrypoint-initdb.d/db_init.sh
       # binding volume for Postgres database
       - ../${POSTGRES_DIRECTORY}:/var/lib/postgresql/data
-      # binding database backup file
-      - ./dev-configs/database_backup.gz:/home/database_backup.gz:ro
     ports: 
       - 9999:5432
     networks: 
@@ -54,16 +52,10 @@ services:
   #   container_name: me-ruby-rails
   #   depends_on: 
   #     - database
-  #   environment:
-  #     RAILS_ENV: development
-  #     DATABASE_HOST: database
-  #     DEV_DATABASE_NAME: picto
-  #     TEST_DATABASE_NAME: makersempire_test
-  #     PROD_DATABASE_NAME: makersempire_dev
-  #     DATABASE_USER: docker
-  #     DATABASE_PASSWORD: docker
+  #   env_file:
+  #     - ./env-variables/development.env
   #   volumes: 
-  #     - ./rails:/rails:cached
+  #     - ../${RAILS_DIRECTORY}:/${RAILS_DIRECTORY}:cached
   #   ports:
   #     - 3000:3000
   #   networks: 
