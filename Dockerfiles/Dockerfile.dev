@@ -34,9 +34,6 @@ RUN apt-get update && apt-get install -y --allow-unauthenticated \
   # Noted: Check phpinfo(); for the additional .ini files folder
   && pecl install -f xdebug-2.7.2 \
   && echo "zend_extension=$(find /usr/lib/php/ -name xdebug.so)" > /etc/php/7.0/apache2/conf.d/xdebug.ini
-  # Add gpg key and install rvm
-  # && gpg2 --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB \
-  # && curl -sSL https://get.rvm.io | bash -s stable
   
 # Create folder for Rails
 RUN mkdir /${rails_directory}
@@ -54,7 +51,7 @@ COPY ./dev-configs/${rails_directory}/.ruby-gemset /${rails_directory}
 COPY ./dev-configs/${rails_directory}/.ruby-version /${rails_directory}
 
 RUN chmod +x ./ruby-docker-bootstrap.sh \
-    && ./ruby-docker-bootstrap.sh "${ruby-version}" ${rails_directory} \
+    && ./ruby-docker-bootstrap.sh "${ruby_version}" "${rails_directory}" \
     && echo 'source /usr/share/rvm/scripts/rvm' >> ~/.bashrc
 
 WORKDIR /var/www/html
