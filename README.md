@@ -1,12 +1,12 @@
 # dockerized-php-rails-postgres
 
-Quickly spin up dockerized development environment that support PHP api and Postgres database. Ruby on Rails is installed on api node to support `rake` commands and deployment to production environment.
+Quickly spin up dockerized development environment that support PHP api and Postgres database. Ruby on Rails is installed on api node to support `rake db:migrate` commands and deployment to production environment.
 
 I make this to replace Vagrant & VirtualBox setup which made my laptop fan runs like crazy. Besides, Docker images use less storage as it only install the necessary packages. The main benefits of this setup include but not limited to:
 
 - Fast, simple, flexible and lightweight.
 - Easily spin up any development environment without the hurdle of OS barrier.
-- PHP debug integration with Visual Studio Code out of the box.
+- PHP debug using XDebug integration with Visual Studio Code out of the box.
 
 ## Prerequisite
 
@@ -29,10 +29,11 @@ where the variables are:
 - RAIL_GIT_URL: Rails git repository
 - API_GIT_URL: PHP api git repository
 - DATABASE_BACKUP_PATH: path or url to database *.gz backup file
-- RUBY_VERSION: Ruby version (eg. 2.4.9)
+- RUBY_VERSION: Ruby version (default: 2.4.9)
 - RUBY_RAIL_GEMSET: RVM gemset name for Rails repository
 - RUBY_API_GEMSET: RVM gemset name for PHP api repository (this support deployment to production environment from within PHP api docker)
 
+**Tip**: You can run `dev_bootstrap.sh` without passing params too but you need to make sure you have your Rails and PHP repositories available locally at default locations. Please check the **Notes** section below for more information about directory structure. Other than that, this dockerized environment should spin up normally with an empty Postgres database named `example_db`.
 ## PHP debug with Visual Studio Code, Xdebug & Docker
 1. Once you install Visual Code, click on the Extensions icon on the left and install the [PHP Debug](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug) and [PHP IntelliSense](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-intellisense) extensions from Felix Becker. Strictly speaking, you can debug without the PHP IntelliSense extension, but it’s very nice to have.
 2. You will need to create a debugging task for PHP. In Visual Studio Code, pull down the Debug menu and select “Add Configuration”. If you have the PHP Debug Extension installed, you will have an option in the list for “PHP”. Select it.
