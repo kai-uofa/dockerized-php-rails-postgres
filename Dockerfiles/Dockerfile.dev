@@ -1,0 +1,62 @@
+FROM ubuntu:xenial
+
+LABEL maintainer="kien@makersempire.com"
+
+ARG ruby_version=2.4.9
+ARG rails_directory=rails
+ARG php_directory=php-api
+
+# install some pre-requisites dependencies & repositories
+RUN apt-get update && apt-get install -y \
+  locales curl lsb-release openssh-server sudo \
+  python apache2 software-properties-common gnupg2 \
+  && apt-add-repository -y ppa:rael-gc/rvm
+
+# install ME dependencies
+RUN apt-get update && apt-get install -y --allow-unauthenticated \
+  patch bzip2 gawk g++ gcc autoconf \
+  automake bison libc6-dev libffi-dev \
+  libgdbm-dev libncurses5-dev libsqlite3-dev \
+  libtool libyaml-dev make pkg-config \
+  sqlite3 zlib1g-dev libgmp-dev libreadline6-dev \
+  libssl-dev php7.0 php7.0-fpm php7.0-dev \
+  php7.0-cli php7.0-common php7.0-mbstring php7.0-gd \
+  php7.0-mcrypt libapache2-mod-php unzip libdbd-pg-perl \
+  php-curl php-pear php7.0-pgsql vim \
+  composer redis-server php-redis ansible \
+  libpq-dev libmagic-dev \
+  # added rvm here as suggested for Ubuntu by: https://github.com/rvm/ubuntu_rvm
+  nodejs imagemagick rvm \
+  && apt-get clean \
+  # ensure we have the en_GB.UTF-8 locale available
+  && locale-gen en_GB.UTF-8 \
+  # Install & config Xdebug 2.7.2
+  # Noted: Check phpinfo(); for the additional .ini files folder
+  && pecl install -f xdebug-2.7.2 \
+  && echo "zend_extension=$(find /usr/lib/php/ -name xdebug.so)" > /etc/php/7.0/apache2/conf.d/xdebug.ini
+  # Add gpg key and install rvm
+  # && gpg2 --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB \
+  # && curl -sSL https://get.rvm.io | bash -s stable
+  
+# Create folder for Rails
+RUN mkdir /${rails_directory}
+
+COPY ./dev-configs/ruby-docker-bootstrap.sh .
+
+COPY ./dev-configs/${php_directory}/Gemfile /var/www/html
+COPY ./dev-configs/${php_directory}/Gemfile.lock /var/www/html
+COPY ./dev-configs/${php_directory}/.ruby-gemset /var/www/html
+COPY ./dev-configs/${php_directory}/.ruby-version /var/www/html
+
+COPY ./dev-configs/${rails_directory}/Gemfile /${rails_directory}
+COPY ./dev-configs/${rails_directory}/Gemfile.lock /${rails_directory}
+COPY ./dev-configs/${rails_directory}/.ruby-gemset /${rails_directory}
+COPY ./dev-configs/${rails_directory}/.ruby-version /${rails_directory}
+
+RUN chmod +x ./ruby-docker-bootstrap.sh \
+    && ./ruby-docker-bootstrap.sh "${ruby-version}" ${rails_directory}
+    # && echo 'source /usr/share/rvm/scripts/rvm' >> ~/.bashrc
+
+WORKDIR /var/www/html
+
+CMD apachectl -D FOREGROUND

@@ -1,0 +1,80 @@
+version: '3.8'
+
+services: 
+  # Credit https://medium.com/@jasonterando/debugging-with-visual-studio-code-xdebug-and-docker-on-windows-b63a10b0dec
+  development:
+    build:
+      context: .
+      dockerfile: ./Dockerfiles/Dockerfile.dev
+      args:
+        ruby_version: 2.4.9
+        rails_directory: rails
+        php_directory: php-api
+    image: me-dev-api
+    container_name: me-dev-api
+    env_file:
+      - ./env-variables/development.env
+    volumes:
+      # binding volume for PHP api
+      - ../php-api:/var/www/html:cached
+      # binding volume for Rails
+      - ../rails:/rails:cached
+    ports:
+      - 4567:80
+    depends_on: 
+      - database
+    networks: 
+      me-dev-network:
+        ipv4_address: 172.20.0.101
+    
+  database:
+    image: postgres
+    container_name: me-dev-postgres
+    restart: always
+    env_file:
+      - ./env-variables/database.env
+    volumes: 
+      # [Do Not Change] binding volume for init.sql
+      - ./dev-configs/db_init.sh:/docker-entrypoint-initdb.d/db_init.sh
+      # binding volume for Postgres database
+      - ../postgres-data:/var/lib/postgresql/data
+      # binding database backup file
+      - ./dev-configs/database_backup.gz:/home/database_backup.gz:ro
+    ports: 
+      - 9999:5432
+    networks: 
+      me-dev-network:
+        ipv4_address: 172.20.0.102
+  
+  # ruby_rails:
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfiles/Dockerfile.rails
+  #   command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+  #   image: me-ruby-rails
+  #   container_name: me-ruby-rails
+  #   depends_on: 
+  #     - database
+  #   environment:
+  #     RAILS_ENV: development
+  #     DATABASE_HOST: database
+  #     DEV_DATABASE_NAME: picto
+  #     TEST_DATABASE_NAME: makersempire_test
+  #     PROD_DATABASE_NAME: makersempire_dev
+  #     DATABASE_USER: docker
+  #     DATABASE_PASSWORD: docker
+  #   volumes: 
+  #     - ./rails:/rails:cached
+  #   ports:
+  #     - 3000:3000
+  #   networks: 
+  #     me-dev-network:
+  #       ipv4_address: 172.20.0.103
+
+networks: 
+  me-dev-network:
+    name: me-dev-network
+    driver: bridge
+    ipam:
+      config: 
+      - subnet: 172.20.0.0/24

@@ -1,0 +1,26 @@
+# Credit: https://docs.docker.com/compose/rails/
+# Credit: https://github.com/chrisf/rails-postgres-docker/blob/master/Dockerfile
+# Credit: https://www.codewithjason.com/dockerize-rails-application/
+# Credit: https://evilmartians.com/chronicles/ruby-on-whales-docker-for-ruby-rails-development
+FROM ruby:2.4.9
+
+# Use a directory called /rails in which to store this application's files.
+# The directory name is arbitrary and could have been anything.
+WORKDIR /rails
+
+COPY ./rails /rails
+
+# Install some dependencies
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    && apt-get update -qq && apt-get install -y yarn build-essential nodejs postgresql-client libpq-dev libmagic-dev \
+    # Install rvm
+    && gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB \
+    && curl -sSL https://get.rvm.io | bash -s stable \
+    # Run bundle install to install the Ruby dependencies.
+    && bundle install \
+    # Run yarn install to install JavaScript dependencies.
+    && yarn install --check-files
+
+# Set "rails server -b 0.0.0.0" as the command to run when this container starts.
+CMD ["rails", "server", "-b", "0.0.0.0"]
