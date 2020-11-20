@@ -11,7 +11,7 @@
             "port": 9000,
             "log": true,
             "pathMappings": {
-                "/var/www/html": "${workspaceFolder}/api-server"
+                "/var/www/html": "${workspaceFolder}"
             },
             "xdebugSettings": {
                 "max_data": 65535,

@@ -33,6 +33,41 @@ where the variables are:
 - RUBY_RAIL_GEMSET: RVM gemset name for Rails repository
 - RUBY_API_GEMSET: RVM gemset name for PHP api repository (this support deployment to production environment from within PHP api docker)
 
+## PHP debug with Visual Studio Code, Xdebug & Docker
+1. Once you install Visual Code, click on the Extensions icon on the left and install the [PHP Debug](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug) and [PHP IntelliSense](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-intellisense) extensions from Felix Becker. Strictly speaking, you can debug without the PHP IntelliSense extension, but it’s very nice to have.
+2. You will need to create a debugging task for PHP. In Visual Studio Code, pull down the Debug menu and select “Add Configuration”. If you have the PHP Debug Extension installed, you will have an option in the list for “PHP”. Select it.
+By default, there are two entries created. The first, “Listen for XDebug” is the one you’ll need. The second, “Launch currently open script” you will not use, at least here. Please play attention to these points:
+   - The port number has to match what’s in your XDEBUG_CONFIG set up in your docker-compose.yml file.
+   - The path mappings need to be correct. Do not use drive letters, do not use relative paths, or anything other than ${workspaceFolder} to map to your files.
+   - The other xdebugSettings are put in to help ensure that I can drill down when inspecting arrays and such. You can tweak these values to your liking.
+
+3. You will want to update the `.vscode/launch.json` file inside your PHP workspace as follows. Running `dev_bootstrap.sh` will do this for you as well.
+   ```json
+   {
+      // Use IntelliSense to learn about possible attributes.
+      // Hover to view descriptions of existing attributes.
+      // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+      "version": "0.2.0",
+      "configurations": [
+          {
+              "name": "Listen for XDebug",
+              "type": "php",
+              "request": "launch",
+              "port": 9000,
+              "log": true,
+              "pathMappings": {
+                  "/var/www/html": "${workspaceFolder}"
+              },
+              "xdebugSettings": {
+                  "max_data": 65535,
+                  "show_hidden": 1,
+                  "max_children": 100,
+                  "max_depth": 5
+              }
+          }
+      ]
+    }
+   ```
 ## Notes
 - Services' environment variables are defined in `*.env` files within `env-variables` folder, you might need to change them to suite your need.
 - Docker-compose's environment variables are generated during bootstrapping process, you might want to check the files to change these variables.

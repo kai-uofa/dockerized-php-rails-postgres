@@ -1,2 +1,3 @@
 .env
 /dev-configs/*.gz
+/dev-configs/*/
