@@ -43,6 +43,7 @@ services:
       me-dev-network:
         ipv4_address: 172.20.0.102
   
+  # This service uses official image from dockerhub. No RVM
   # ruby_rails:
   #   build:
   #     context: .

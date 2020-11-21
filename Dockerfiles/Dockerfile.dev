@@ -36,7 +36,11 @@ RUN apt-get update && apt-get install -y --allow-unauthenticated \
   && echo "zend_extension=$(find /usr/lib/php/ -name xdebug.so)" > /etc/php/7.0/apache2/conf.d/xdebug.ini
   
 # Create folder for Rails
-RUN mkdir /${rails_directory}
+RUN mkdir /${rails_directory} \
+    # forward request and error logs to docker log collector
+    # https://docs.docker.com/config/containers/logging/
+    && ln -sf /dev/stdout /var/log/apache2/access.log \
+	  && ln -sf /dev/stderr /var/log/apache2/error.log
 
 COPY ./dev-configs/ruby-docker-bootstrap.sh .
 

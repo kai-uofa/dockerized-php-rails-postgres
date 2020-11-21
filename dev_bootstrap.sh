@@ -2,43 +2,57 @@
 
 # Usage:
 #   chmod +x ./dev_bootstrap.sh
-#   ./dev_bootstrap.sh $RAIL_GIT_URL $API_GIT_URL $DATABASE_BACKUP_PATH $RUBY_VERSION $RUBY_RAIL_GEMSET $RUBY_API_GEMSET
+#   ./dev_bootstrap.sh $DATABASE_BACKUP_PATH $RAIL_GIT_URL $RAIL_BRANCH $API_GIT_URL $API_BRANCH $RUBY_VERSION $RUBY_RAIL_GEMSET $RUBY_API_GEMSET
 
-if [[ ${1} == http* ]] || [[ ${1} == git* ]]; then
-    RAIL_GIT_URL=$1
+DATABASE_BACKUP_PATH=$1
+
+if [[ ${2} == http* ]] || [[ ${2} == git* ]]; then
+    RAIL_GIT_URL=$2
 else
     echo "[WARNING] No Rails git URL. Please make sure you have your Rails repository locally."
     RAIL_GIT_URL=''
 fi
 
-if [[ ${2} == http* ]] || [[ ${2} == git* ]]; then
-    API_GIT_URL=$2
+if [ -z "$3" ]; then
+    echo "[WARNING] No Rails branch is set, using master branch."
+    RAIL_BRANCH='master'
+else
+    RAIL_BRANCH=$3
+fi
+
+if [[ ${4} == http* ]] || [[ ${4} == git* ]]; then
+    API_GIT_URL=$4
 else
     echo "[WARNING] No API git URL. Please make sure you have your API repository locally."
     API_GIT_URL=''
 fi
 
-DATABASE_BACKUP_PATH=$3
-
-if [ -z "$4" ]; then
-    echo "[WARNING] No Ruby version is set. Using default version."
-    RUBY_VERSION='2.4.9'
-else
-    RUBY_VERSION=$4
-fi
-
 if [ -z "$5" ]; then
-    echo "[WARNING] No Gemset name for Rails is set. Using default name."
-    RUBY_RAIL_GEMSET='gemset_rails'
+    echo "[WARNING] No API branch is set, using master branch."
+    API_BRANCH='live'
 else
-    RUBY_RAIL_GEMSET=$5
+    API_BRANCH=$5
 fi
 
 if [ -z "$6" ]; then
+    echo "[WARNING] No Ruby version is set. Using default version."
+    RUBY_VERSION='2.4.9'
+else
+    RUBY_VERSION=$6
+fi
+
+if [ -z "$7" ]; then
+    echo "[WARNING] No Gemset name for Rails is set. Using default name."
+    RUBY_RAIL_GEMSET='gemset_rails'
+else
+    RUBY_RAIL_GEMSET=$7
+fi
+
+if [ -z "$8" ]; then
     echo "[WARNING] No Gemset name for API is set. Using default name."
     RUBY_API_GEMSET='gemset_api'
 else
-    RUBY_API_GEMSET=$6
+    RUBY_API_GEMSET=$8
 fi
 
 RAILS_DIRECTORY='rails'
@@ -111,7 +125,7 @@ fi
 docker-compose run development composer install
 
 # Clean up docker: all stopped containers, all networks not used by at least 1 container, all dangling images and build caches.
-docker system prune
+docker system prune --force
 
 # Clean up temporary files
 if [ -d "./dev-configs/${PHP_DIRECTORY}" ]; then
