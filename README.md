@@ -1,5 +1,4 @@
 # dockerized-php-rails-postgres
-
 Quickly spin up dockerized development environment that support PHP api and Postgres database. Ruby on Rails is installed on api node to support `rake db:migrate` commands and deployment to production environment.
 
 I make this to replace Vagrant & VirtualBox setup which made my laptop fan runs like crazy. Besides, Docker images use less storage as it only install the necessary packages to run the app. The main benefits of this setup include but not limited to:
@@ -9,9 +8,7 @@ I make this to replace Vagrant & VirtualBox setup which made my laptop fan runs 
 - PHP debug using XDebug integration with Visual Studio Code.
 
 ## Prerequisite
-
 - [Docker](http://docker.com) (**mandatory**) is a set of platform as a service products that use OS-level virtualization to deliver software in packages called containers. Containers are isolated from one another and bundle their own software, libraries and configuration files; they can communicate with each other through well-defined channels. Docker Desktop can be downloaded from: https://www.docker.com/products/docker-desktop
-  
 - [Visual Studio Code](https://code.visualstudio.com) (*optional to support php debug and highly recommend*) is a free source-code editor made by Microsoft for Windows, Linux and macOS. Features include support for debugging, syntax highlighting, intelligent code completion, snippets, code refactoring, and embedded Git.
 
 ## Quick start
@@ -25,7 +22,6 @@ chmod +x ./dev_bootstrap.sh
 ./dev_bootstrap.sh 'DATABASE_BACKUP_PATH' 'RAIL_GIT_URL' 'RAIL_BRANCH' 'API_GIT_URL' 'API_BRANCH' 'RUBY_VERSION' 'RUBY_RAIL_GEMSET' 'RUBY_API_GEMSET'
 ```
 where the variables are:
-
 - DATABASE_BACKUP_PATH: path or url to database *.gz backup file
 - RAIL_GIT_URL: Rails git repository
 - RAIL_BRANCH: Rails branch you want to clone
@@ -35,16 +31,30 @@ where the variables are:
 - RUBY_RAIL_GEMSET: RVM gemset name for Rails repository
 - RUBY_API_GEMSET: RVM gemset name for PHP api repository (this support deployment to production environment from within PHP api docker)
 
-**Tip**: You can run `dev_bootstrap.sh` without passing params too but you need to make sure you have your Rails and PHP repositories available locally at default locations. Please check the **Notes** section below for more information about directory structure. Other than that, this dockerized environment should spin up normally with an empty Postgres database named `example_db`.
-## PHP debug with Visual Studio Code, Xdebug & Docker
-1. Once you install Visual Code, click on the Extensions icon on the left and install the [PHP Debug](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug) and [PHP IntelliSense](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-intellisense) extensions from Felix Becker. Strictly speaking, you can debug without the PHP IntelliSense extension, but it’s very nice to have.
-2. Only on Windows, you need to install PHP locally. The Visual Studio Code extensions mentioned above rely upon PHP running locally on Windows, your application code will not be using this version of PHP. If you don’t have PHP on Windows already, download the most current PHP Non Thread Safe version from [php.net](https://windows.php.net/download/). Add the directory containing `php.exe` to your path. Make sure you can run `php -version` from a new command prompt.
-3. You will need to create a debugging task for PHP. In Visual Studio Code, pull down the Debug menu and select “Add Configuration”. If you have the PHP Debug Extension installed, you will have an option in the list for “PHP”. Select it.
-By default, there are two entries created. The first, “Listen for XDebug” is the one you’ll need. The second, “Launch currently open script” you will not use, at least here. Please play attention to these points:
-   - The port number has to match what’s in your XDEBUG_CONFIG set up in your docker-compose.yml file.
-   - The path mappings need to be correct. Do not use drive letters, do not use relative paths, or anything other than ${workspaceFolder} to map to your files.
-   - The other xdebugSettings are put in to help ensure that I can drill down when inspecting arrays and such. You can tweak these values to your liking.
+To stop running services, use the following commands:
+```bash
+cd ./my_development_site # if youare not in this folder yet
+docker-compose stop
+```
 
+To start existing services, use the following command:
+```bash
+cd ./my_development_site # if youare not in this folder yet
+docker-compose start
+```
+
+**Some tips while using this setup**: 
+- You can run `dev_bootstrap.sh` without passing params too but you need to make sure you have your Rails and PHP repositories available locally at default locations. Please check the **Notes** section below for more information about directory structure. Other than that, this dockerized environment should spin up normally with an empty Postgres database named `example_db`.
+- If you have Visual Studio Code, you should install the [Docker extension](https://code.visualstudio.com/docs/containers/overview) for better management.
+- If you would like to know more about Docker and Docker-compose, check out this [cheatsheet](https://dockerlabs.collabnix.com/docker/cheatsheet/)
+
+## PHP debug with Visual Studio Code, Xdebug & Docker
+1. Once you install Visual Studio Code, click on the Extensions icon on the left and install the [PHP Debug](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug) and [PHP IntelliSense](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-intellisense) extensions from Felix Becker. Strictly speaking, you can debug without the PHP IntelliSense extension, but it’s very nice to have.
+2. Only on Windows, you need to install PHP locally. The Visual Studio Code extensions mentioned above rely upon PHP running locally on Windows, your application code will not be using this version of PHP. If you don’t have PHP on Windows already, download the most current PHP Non Thread Safe version from [php.net](https://windows.php.net/download/). Add the directory containing `php.exe` to your path. Make sure you can run `php -version` from a new command prompt.
+3. You will need to create a debugging task for PHP. In Visual Studio Code, pull down the Debug menu and select `Add Configuration`. If you have the PHP Debug extension installed, you will have an option in the list for PHP. By default, there are two entries created. The first, `Listen for XDebug` is the one you’ll need. The second, `Launch currently open script` you will not use, at least here. Please play attention to these points:
+   - The port number has to match what’s in your XDEBUG_CONFIG set up in your `docker-compose.yaml` file.
+   - The path mappings need to be correct. Do not use drive letters, do not use relative paths, or anything other than `${workspaceFolder}` to map to your files.
+   - The other `xdebugSettings` are put in to help ensure that I can drill down when inspecting arrays and such. You can tweak these values to your liking.
 4. You will want to update the `.vscode/launch.json` file inside your PHP workspace as follows. Running `dev_bootstrap.sh` will do this for you as well.
    ```json
    {
@@ -72,6 +82,7 @@ By default, there are two entries created. The first, “Listen for XDebug” is
       ]
     }
    ```
+
 ## Notes
 - Services' environment variables are defined in `*.env` files within `env-variables` folder, you might need to change them to suite your need.
 - Docker-compose's environment variables are generated during bootstrapping process, you might want to check the files to change these variables.
@@ -85,6 +96,7 @@ By default, there are two entries created. The first, “Listen for XDebug” is
     ├── postgres-data
     └── rails
   ``` 
+
 ## References
 - https://docs.docker.com/compose/rails/
 - https://www.codewithjason.com/dockerize-rails-application/
